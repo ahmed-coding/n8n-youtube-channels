@@ -1,5 +1,5 @@
 {
-  "name": "PslyoMind channel on youtube copy",
+  "name": "PslyoMind-channel",
   "nodes": [
     {
       "parameters": {
@@ -24,10 +24,10 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        -2720,
-        848
+        288,
+        944
       ],
-      "id": "bae00c4d-e7ea-4bbb-9eff-ff3b3b4fd3b3",
+      "id": "9795fa40-bbd3-447c-8ea7-5fe8a7a35d68",
       "name": "Configure1"
     },
     {
@@ -42,10 +42,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        -1152,
-        848
+        1856,
+        944
       ],
-      "id": "c8391771-e746-4c17-a0e6-3d4f213c8495",
+      "id": "0eb86855-e37d-4ce6-8c08-13a0c1dac280",
       "name": "Start generating the video1"
     },
     {
@@ -55,10 +55,10 @@
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
       "position": [
-        -704,
-        832
+        2304,
+        928
       ],
-      "id": "c8434a4a-caf9-4ead-85f3-1e16bdaaf57e",
+      "id": "e4ccb598-ddd4-4373-8e39-191836453ff3",
       "name": "Wait1",
       "webhookId": "873acdce-b922-4ce7-b28e-9161d4db4156"
     },
@@ -70,10 +70,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        320,
-        768
+        3328,
+        864
       ],
-      "id": "5f8e7872-a3fc-458b-a792-f8cad7bb091f",
+      "id": "e20e274a-2411-4511-96ab-12695ac3bf61",
       "name": "Download the video1",
       "alwaysOutputData": true,
       "retryOnFail": false
@@ -86,10 +86,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        -432,
-        832
+        2576,
+        928
       ],
-      "id": "2896c0a1-5e75-421f-95c8-392c3d307c79",
+      "id": "2712ae73-d916-4176-998c-7493ab5330fb",
       "name": "Check video status1",
       "alwaysOutputData": false,
       "retryOnFail": false
@@ -122,10 +122,10 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        -208,
-        832
+        2800,
+        928
       ],
-      "id": "9df67714-c512-4b7b-bda3-90bdfeec93b2",
+      "id": "e482d48e-aba2-435a-9c8c-a3caa4b6cb3d",
       "name": "Ready?1"
     },
     {
@@ -136,39 +136,39 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        -2528,
-        848
+        480,
+        944
       ],
-      "id": "e491fbf2-0f9c-4777-829a-276809e0a365",
+      "id": "2f96a817-a6c8-4f38-a519-142a7ea87815",
       "name": "Get music tags1"
     },
     {
       "parameters": {
         "schemaType": "manual",
-        "inputSchema": "{\n    \"type\": \"object\",\n    \"properties\": {\n        \"musicTag\": {\n            \"type\": \"string\",\n            \"description\": \"the selected music tag that goes well with the video\"\n        }\n    },\n    \"required\": [\n        \"musicTag\"\n    ]\n}"
+        "inputSchema": "{\n    \"type\": \"object\",\n    \"properties\": {\n        \"musicTag\": {\n            \"type\": \"string\",\n            \"description\": \"the selected music tag that goes well with the video\"\n        },\n        \"description\": {\n            \"type\": \"string\",\n            \"description\": \"a keyword-rich description that scores at least 90% in SEO analysis\"\n        },\n        \"hashtags\": {\n            \"type\": \"string\",\n            \"description\": \"the relevant hashtags based on the video content so that YouTube's algorithms promote it effectively\"\n        }\n    },\n    \"required\": [\n        \"musicTag\",\n        \"description\",\n        \"hashtags\"\n        \n    ]\n}"
       },
       "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
       "typeVersion": 1.2,
       "position": [
-        -1344,
-        1072
+        1664,
+        1168
       ],
-      "id": "d4582e83-ed6d-4971-bd68-273819da7b3d",
+      "id": "04a95dd8-f1ba-4a1e-8810-e343b8310248",
       "name": "Structured Output Parser3"
     },
     {
       "parameters": {
         "promptType": "define",
-        "text": "=I'm generating a video programmatically using an API. I've already generated the scenes, and your task is to find the right music tag for he video.\n\n<VideoScenes>\n{{ $json.output.scenes.map(item => item.text).map(item => `<VideoScene>${item}</VideoScene>`).join('\\n') }}\n</VideoScenes>\n\n<MusicTags>\n{{ $('Group the music tags1').item.json.data.map(item => `<MusicTag>${item}</MusicTag>`).join('\\n') }}\n</MusicTags>",
+        "text": "=I am creating a video programmatically using an API. I have already created the scenes, and your task is to find suitable background music for the video, write a keyword-rich description that scores at least 90% in SEO analysis, and provide relevant hashtags based on the video content so that YouTube's algorithms promote it effectively.  I expect you to deliver everything professionally.\n\n<VideoScenes>\n{{ $json.output.scenes.map(item => item.text).map(item => `<VideoScene>${item}</VideoScene>`).join('\\n') }}\n</VideoScenes>\n\n<MusicTags>\n{{ $('Group the music tags1').item.json.data.map(item => `<MusicTag>${item}</MusicTag>`).join('\\n') }}\n</MusicTags>",
         "hasOutputParser": true
       },
       "type": "@n8n/n8n-nodes-langchain.chainLlm",
       "typeVersion": 1.6,
       "position": [
-        -1488,
-        848
+        1520,
+        944
       ],
-      "id": "a972121a-415b-41f8-81b4-15298cc70ae6",
+      "id": "abaeb703-dcfd-4544-b876-c73966b2c580",
       "name": "Pick the right music1",
       "retryOnFail": true
     },
@@ -180,10 +180,10 @@
       "type": "n8n-nodes-base.aggregate",
       "typeVersion": 1,
       "position": [
-        -2240,
-        848
+        768,
+        944
       ],
-      "id": "addb688d-1db7-459d-8d41-8ff515bab19e",
+      "id": "9dbca38f-de20-4d9c-a72f-f876e11cdeaa",
       "name": "Group the music tags1"
     },
     {
@@ -199,10 +199,10 @@
       "type": "n8n-nodes-base.scheduleTrigger",
       "typeVersion": 1.2,
       "position": [
-        -2960,
-        848
+        48,
+        944
       ],
-      "id": "f4c3b089-03fb-44f5-a07c-05847deab315",
+      "id": "e15fe1c0-c726-4e6b-aced-f814c5a86f44",
       "name": "Schedule Trigger1"
     },
     {
@@ -217,16 +217,16 @@
       "type": "n8n-nodes-base.youTube",
       "typeVersion": 1,
       "position": [
-        688,
-        768
+        3696,
+        864
       ],
-      "id": "4f3dc46d-bb85-44c0-97fc-27ccccde6325",
+      "id": "fe726527-8e51-4285-bc7f-b5e8753dc5bb",
       "name": "YouTube Video",
       "retryOnFail": true,
       "maxTries": 5,
       "credentials": {
         "youTubeOAuth2Api": {
-          "id": "ow2hxK9eqrCRWaFb",
+          "id": "hKJZE5Qg9h4aSC3J",
           "name": "YouTube account"
         }
       }
@@ -238,10 +238,10 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        -2992,
-        624
+        16,
+        720
       ],
-      "id": "cf4fdbf7-1422-47e7-b4fa-2bddcffe6c4b",
+      "id": "610b70f7-c385-4cf3-a405-e68007f372b1",
       "name": "Sticky Note"
     },
     {
@@ -251,10 +251,10 @@
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        -3008,
-        -96
+        0,
+        0
       ],
-      "id": "4075f640-9bad-4fd3-aa65-4db2c2634ebe",
+      "id": "4e9225a9-f400-4781-b65a-02ae97591ebc",
       "name": "Sticky Note1"
     },
     {
@@ -266,10 +266,10 @@
       "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
       "typeVersion": 1.3,
       "position": [
-        -1856,
-        1168
+        1152,
+        1264
       ],
-      "id": "13488a91-ddae-42fc-8fd7-766af186dbe5",
+      "id": "f214f907-b1d2-4979-bdbe-a93e0974de80",
       "name": "Simple Memory"
     },
     {
@@ -280,10 +280,10 @@
       "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
       "typeVersion": 1.2,
       "position": [
-        -1696,
-        1152
+        1312,
+        1248
       ],
-      "id": "8096c6c1-cc41-4949-b415-1d37cba131b6",
+      "id": "6623b769-633c-4c1a-8826-10ced2b63ca0",
       "name": "Structured Output Parser4"
     },
     {
@@ -293,14 +293,14 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
       "typeVersion": 1,
       "position": [
-        -1984,
-        1152
+        1024,
+        1248
       ],
-      "id": "111291c6-557c-4763-85ec-0a9a068df74d",
+      "id": "6d6fe9d9-f357-4b1b-b870-fb7e2077129d",
       "name": "Google Gemini Chat Model2",
       "credentials": {
         "googlePalmApi": {
-          "id": "uZNIeRLPuGdyNfYf",
+          "id": "jdG6b3iZG4qGvcqs",
           "name": "Google Gemini(PaLM) Api account"
         }
       }
@@ -315,10 +315,10 @@
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 3,
       "position": [
-        -1936,
-        848
+        1072,
+        944
       ],
-      "id": "e16756da-b2ed-432f-bef8-cd29d34e4304",
+      "id": "6583f380-0852-41af-bcdc-1218994b16cf",
       "name": "Generate content1",
       "retryOnFail": true
     },
@@ -334,14 +334,14 @@
       "type": "n8n-nodes-base.youTube",
       "typeVersion": 1,
       "position": [
-        352,
-        0
+        3360,
+        96
       ],
-      "id": "6806f583-2d68-4827-b970-b9de7b0bf241",
+      "id": "f3750896-08b0-43dd-993f-3dfd2e18b5de",
       "name": "YouTube Short",
       "credentials": {
         "youTubeOAuth2Api": {
-          "id": "ow2hxK9eqrCRWaFb",
+          "id": "hKJZE5Qg9h4aSC3J",
           "name": "YouTube account"
         }
       }
@@ -374,10 +374,10 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        -224,
-        64
+        2784,
+        160
       ],
-      "id": "99e987c1-0b3c-4baa-a75c-ba47411375c4",
+      "id": "99bc71b9-ab07-422f-b98d-7ee35c3c1ccd",
       "name": "Ready?"
     },
     {
@@ -388,10 +388,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        0,
-        0
+        3008,
+        96
       ],
-      "id": "296f2e93-5927-4c59-bd41-779565819c95",
+      "id": "525f2872-bb2d-4647-a96e-4e3144e998bd",
       "name": "Download the video",
       "alwaysOutputData": true,
       "retryOnFail": false
@@ -409,10 +409,10 @@
       "type": "n8n-nodes-base.scheduleTrigger",
       "typeVersion": 1.2,
       "position": [
-        -2976,
-        80
+        32,
+        176
       ],
-      "id": "92ee9854-c243-4b39-ae5a-82d697ae61f3",
+      "id": "43622d18-7f90-48cf-bd75-fc6704af8492",
       "name": "Schedule Trigger"
     },
     {
@@ -423,24 +423,24 @@
       "type": "n8n-nodes-base.aggregate",
       "typeVersion": 1,
       "position": [
-        -2256,
-        80
+        752,
+        176
       ],
-      "id": "8bd7a368-2960-4b0c-a3b8-8159966104f5",
+      "id": "c6407401-bd46-4131-9af1-72738d3d4f3d",
       "name": "Group the music tags"
     },
     {
       "parameters": {
         "schemaType": "manual",
-        "inputSchema": "{\n    \"type\": \"object\",\n    \"properties\": {\n        \"musicTag\": {\n            \"type\": \"string\",\n            \"description\": \"the selected music tag that goes well with the video\"\n        }\n    },\n    \"required\": [\n        \"musicTag\"\n    ]\n}"
+        "inputSchema": "{\n    \"type\": \"object\",\n    \"properties\": {\n        \"musicTag\": {\n            \"type\": \"string\",\n            \"description\": \"the selected music tag that goes well with the video\"\n        },\n        \"description\": {\n            \"type\": \"string\",\n            \"description\": \"a keyword-rich description that scores at least 90% in SEO analysis\"\n        },\n        \"hashtags\": {\n            \"type\": \"string\",\n            \"description\": \"the relevant hashtags based on the video content so that YouTube's algorithms promote it effectively\"\n        }\n    },\n    \"required\": [\n        \"musicTag\",\n        \"description\",\n        \"hashtags\"\n        \n    ]\n}"
       },
       "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
       "typeVersion": 1.2,
       "position": [
-        -1360,
-        304
+        1648,
+        400
       ],
-      "id": "67b010f6-ab09-4f7b-a085-610790f36fa5",
+      "id": "016e9b29-e594-4166-b10f-9ef5ea717d5f",
       "name": "Structured Output Parser1"
     },
     {
@@ -451,10 +451,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        -2544,
-        80
+        464,
+        176
       ],
-      "id": "1109a666-f200-4386-aaa7-c02622f87359",
+      "id": "8df54be5-8fb2-4add-952d-5d16a3a36c80",
       "name": "Get music tags"
     },
     {
@@ -465,10 +465,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        -448,
-        64
+        2560,
+        160
       ],
-      "id": "dd943668-6661-48ed-b400-c2af3d55f0d0",
+      "id": "7160d84b-b776-4ea5-98f1-5220b13eb8c3",
       "name": "Check video status",
       "alwaysOutputData": false,
       "retryOnFail": false
@@ -480,10 +480,10 @@
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
       "position": [
-        -720,
-        64
+        2288,
+        160
       ],
-      "id": "9ea88d68-83e6-45ea-81b8-3a727999c700",
+      "id": "f8bd4c4f-dfea-4680-b19d-9cf6b4e75f1a",
       "name": "Wait",
       "webhookId": "f96b7ef5-7f33-4739-b2f6-9b87f7d076be"
     },
@@ -499,10 +499,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        -1152,
-        80
+        1856,
+        176
       ],
-      "id": "78c1a397-ebf4-41ba-a67d-fde5cba153d1",
+      "id": "e7a36f58-f748-4942-a353-74d2622f6cfb",
       "name": "Start generating the video"
     },
     {
@@ -528,10 +528,10 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        -2736,
-        80
+        272,
+        176
       ],
-      "id": "6984f571-4730-490f-916b-91e76fb08ca4",
+      "id": "80b57f49-991f-42a8-978b-f5695fc3f652",
       "name": "Configure"
     },
     {
@@ -543,10 +543,10 @@
       "type": "@n8n/n8n-nodes-langchain.chainLlm",
       "typeVersion": 1.6,
       "position": [
-        -3008,
-        352
+        0,
+        448
       ],
-      "id": "794bcaa5-ac13-4ed4-9f30-0ca9b32991b9",
+      "id": "5f414225-7a05-4f7b-870b-9247a703aebd",
       "name": "Generate content - backup",
       "retryOnFail": true
     },
@@ -557,15 +557,15 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
       "typeVersion": 1,
       "position": [
-        -1984,
-        432
+        1024,
+        528
       ],
-      "id": "0bb6fd31-4a49-42b7-8fda-d64984050604",
+      "id": "092b3324-0146-4fba-95f4-b447cae79072",
       "name": "Google Gemini Chat Model",
       "credentials": {
         "googlePalmApi": {
-          "id": "WRQdLoO2VApZK7LV",
-          "name": "Google Gemini(PaLM) Api account 2"
+          "id": "jdG6b3iZG4qGvcqs",
+          "name": "Google Gemini(PaLM) Api account"
         }
       }
     },
@@ -577,26 +577,26 @@
       "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
       "typeVersion": 1.2,
       "position": [
-        -1744,
-        432
+        1264,
+        528
       ],
-      "id": "9652b756-1787-4cfe-ab27-2d74f132465d",
+      "id": "9a04c5b2-29f3-4f99-9003-cd3489dcc033",
       "name": "Structured Output Parser"
     },
     {
       "parameters": {
         "promptType": "define",
-        "text": "I am creating a video programmatically using an API.\nThe API requires scenes to work with.\n\nEach scene requires the following:\nText that will be converted into audio using AI technology.\nTwo to three keywords to search for background videos from Pexels.\n\nYour Task: Create a long video consisting of several scenes on any topic related to psychology, mental health, manipulation, self-discovery, dark psychology, root causes, social intelligence, or other popular psychology topics.\n\nThe channel name is \"PsyloMind\" and the link https://www.youtube.com/@PsyloMind\n\nEach scene must be unique, engaging, intriguing, and not repeated on the channel to attract viewers and entice them to click and watch the video.\n\nThe video should begin with one of the following hooks:\nProtection Hook, Visual Hook, Paradox Hook, Interactive Hook, Actionable Hook, Self-Discovery Hook, Dark Psychology Hook, Challenge Hook, Root Cause Hook, Social Intelligence Hook.\n\nTopics: Psychology, human behavior, social psychology, the intricacies of the human psyche, human nature, human personalities, human behavior patterns, types of mindsets, , Self-Discovery, Dark Psychology, Root Cause, Social Intelligence and other topics related to the channel's content and target audience.\n\nPace: The video should keep viewers engaged and prevent them from skipping to the end of the viedo.\n\nNo Repetition: Choose a new, trending topic for each video.\n\nStructure/Scenes:\n- The video must be at least four minutes long.\n\n- First Scene: A strong opening to grab attention immediately with a catchy hook in Protection Hook, Visual Hook, Paradox Hook, Interactive Hook, Actionable Hook, Self-Discovery Hook, Dark Psychology Hook, Challenge Hook, Root Cause Hook, Social Intelligence Hook.\n\n- The scenes should be sequentially presented in an engaging style that compels the viewer to continue watching. They should be informative, concise, and provide high-quality content that satisfies the viewer and answers all their questions, keep the sentences punchy and avoid \"filler\" words.\n\n- There should be a 3-5 second gap between each scene.\n\n- The script should be written keeping in mind that Liam's voice will be used for the voiceover, so you should capitalize on the strengths of his voice and avoid its weaknesses.\n\n- Final Scene: A final thought-provoking statement that leaves the viewer thinking. Followed by a clear invitation: \"Subscribe to PsyloMind to unlock the secrets of your mind. Like, comment your thoughts, and visit the channel for more deep dives.\"\n\n\nInstructions:\n\"Now, keeping in mind that he will be using Liam's voice for the voiceover, create a complete script for a Create a long video consisting of several scenes using this format, optimized for  Psychology, human behavior, social psychology, the intricacies of the human psyche, human nature, human personalities, human behavior patterns, types of mindsets, , Self-Discovery, Dark Psychology, Root Cause, Social Intelligence and other topics related to the channel's content and target audience, ready for YouTube Shorts. Make it highly engaging, shareable, and intriguing.\"",
+        "text": "I am creating a video programmatically using an API.\nThe API requires scenes to work with.\n\nEach scene requires the following:\nText that will be converted into audio using AI technology.\nTwo to three keywords to search for background videos from Pexels.\n\nYour Task: Create a long video consisting of several scenes on any topic related to psychology, mental health, manipulation, self-discovery, dark psychology, root causes, social intelligence, or other popular psychology topics.\n\nThe channel name is \"PsyloMind\" and the link https://www.youtube.com/@PsyloMind\n\nEach scene must be unique, engaging, intriguing, and not repeated on the channel to attract viewers and entice them to click and watch the video.\n\nThe video should begin with one of the following hooks:\nProtection Hook, Visual Hook, Paradox Hook, Interactive Hook, Actionable Hook, Self-Discovery Hook, Dark Psychology Hook, Challenge Hook, Root Cause Hook, Social Intelligence Hook.\n\nTopics: Psychology, human behavior, social psychology, the intricacies of the human psyche, human nature, human personalities, human behavior patterns, types of mindsets, , Self-Discovery, Dark Psychology, Root Cause, Social Intelligence and other topics related to the channel's content and target audience.\n\nPace: The video should keep viewers engaged and prevent them from skipping to the end of the viedo.\n\nNo Repetition: Choose a new, trending topic for each video.\n\nStructure/Scenes:\n- The video must be at least 10 minutes long.\n\n- First Scene: A strong opening to grab attention immediately with a catchy hook in Protection Hook, Visual Hook, Paradox Hook, Interactive Hook, Actionable Hook, Self-Discovery Hook, Dark Psychology Hook, Challenge Hook, Root Cause Hook, Social Intelligence Hook.\n\n- The scenes should be sequentially presented in an engaging style that compels the viewer to continue watching. They should be informative, concise, and provide high-quality content that satisfies the viewer and answers all their questions, keep the sentences punchy and avoid \"filler\" words.\n\n- There should be a 3-5 second gap between each scene.\n\n- The script should be written keeping in mind that Liam's voice will be used for the voiceover, so you should capitalize on the strengths of his voice and avoid its weaknesses.\n\n- Final Scene: A final thought-provoking statement that leaves the viewer thinking. Followed by a clear invitation: \"Subscribe to PsyloMind to unlock the secrets of your mind. Like, comment your thoughts, and visit the channel for more deep dives.\"\n\n\nInstructions:\n\"Now, keeping in mind that he will be using Liam's voice for the voiceover, create a complete script for a Create a long video consisting of several scenes using this format, optimized for  Psychology, human behavior, social psychology, the intricacies of the human psyche, human nature, human personalities, human behavior patterns, types of mindsets, , Self-Discovery, Dark Psychology, Root Cause, Social Intelligence and other topics related to the channel's content and target audience, ready for YouTube Shorts. Make it highly engaging, shareable, and intriguing.\"",
         "hasOutputParser": true,
         "options": {}
       },
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 3,
       "position": [
-        -1888,
-        96
+        1120,
+        192
       ],
-      "id": "76dab72b-d867-4632-bece-08abdef2ee06",
+      "id": "4899d8b1-1ed2-4223-bb55-ced656e6fee9",
       "name": "Generate content",
       "retryOnFail": true
     },
@@ -609,25 +609,25 @@
       "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
       "typeVersion": 1.3,
       "position": [
-        -1856,
-        432
+        1152,
+        528
       ],
-      "id": "30078de9-64bd-496b-abea-d7456ac2acfb",
+      "id": "6e73b862-cb45-4c3c-b1b9-402b2ba9e649",
       "name": "Simple Memory1"
     },
     {
       "parameters": {
         "promptType": "define",
-        "text": "=I'm generating a video programmatically using an API. I've already generated the scenes, and your task is to find the right music tag for he video.\n\n<VideoScenes>\n{{ $json.output.scenes.map(item => item.text).map(item => `<VideoScene>${item}</VideoScene>`).join('\\n') }}\n</VideoScenes>\n\n<MusicTags>\n{{ $('Group the music tags').item.json.data.map(item => `<MusicTag>${item}</MusicTag>`).join('\\n') }}\n</MusicTags>",
+        "text": "=I am creating a video programmatically using an API. I have already created the scenes, and your task is to find suitable background music for the video, write a keyword-rich description that scores at least 90% in SEO analysis, and provide relevant hashtags based on the video content so that YouTube's algorithms promote it effectively.  I expect you to deliver everything professionally.\n\n<VideoScenes>\n{{ $json.output.scenes.map(item => item.text).map(item => `<VideoScene>${item}</VideoScene>`).join('\\n') }}\n</VideoScenes>\n\n<MusicTags>\n{{ $('Group the music tags').item.json.data.map(item => `<MusicTag>${item}</MusicTag>`).join('\\n') }}\n</MusicTags>",
         "hasOutputParser": true
       },
       "type": "@n8n/n8n-nodes-langchain.chainLlm",
       "typeVersion": 1.6,
       "position": [
-        -1504,
-        80
+        1504,
+        176
       ],
-      "id": "b971bea6-82e9-430b-a914-64a7a51b04b1",
+      "id": "95b52ccf-e7fb-412e-85f0-ef49b81927f6",
       "name": "Pick the right music",
       "retryOnFail": true
     },
@@ -658,7 +658,9 @@
             "Scenes": "={{ $('Generate content').item.json.output.scenes.length }}",
             "video-type": "Youtube-Long",
             "is-created": "TRUE",
-            "is-publish": "FALSE"
+            "is-publish": "FALSE",
+            "description": "={{ $('Pick the right music').item.json.output.description }}",
+            "hashtags": "={{ $('Pick the right music').item.json.output.hashtags }}"
           },
           "matchingColumns": [
             "Video-Text"
@@ -715,6 +717,26 @@
               "removed": false
             },
             {
+              "id": "description",
+              "displayName": "description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "hashtags",
+              "displayName": "hashtags",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
               "id": "is-created",
               "displayName": "is-created",
               "required": false,
@@ -753,15 +775,15 @@
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.7,
       "position": [
-        0,
-        240
+        3008,
+        336
       ],
-      "id": "e5e13a5b-b38d-4125-8b49-1686a63c7726",
+      "id": "848b5b6d-8046-4daf-bf8b-bda8c202e5d6",
       "name": "Append or update row in sheet",
       "credentials": {
         "googleSheetsOAuth2Api": {
-          "id": "gZaoLxt4XGhKKtsb",
-          "name": "Google Sheets account 2"
+          "id": "QhLEoNxrbLPUasdS",
+          "name": "Google Sheets account"
         }
       }
     },
@@ -907,15 +929,15 @@
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.7,
       "position": [
-        -912,
-        848
+        2096,
+        944
       ],
-      "id": "2f9fe8d0-8937-4920-b342-fa46a1da7358",
+      "id": "7fb7fa53-9d1d-47e4-b2ca-3c6a8d768d7e",
       "name": "Append or update row in sheet1",
       "credentials": {
         "googleSheetsOAuth2Api": {
-          "id": "gZaoLxt4XGhKKtsb",
-          "name": "Google Sheets account 2"
+          "id": "QhLEoNxrbLPUasdS",
+          "name": "Google Sheets account"
         }
       }
     },
@@ -945,8 +967,10 @@
             "Date": "={{ $now.format('yyyy-MM-dd HH:mm:ss') }}",
             "Scenes": "={{ $('Generate content').item.json.output.scenes.length }}",
             "video-type": "Youtube-Long",
-            "is-created": "TRUE",
-            "is-publish": "FALSE"
+            "is-created": "FALSE",
+            "is-publish": "FALSE",
+            "description": "={{ $('Pick the right music').item.json.output.description }}",
+            "hashtags": "={{ $('Pick the right music').item.json.output.hashtags }}"
           },
           "matchingColumns": [
             "Video-Text"
@@ -1003,6 +1027,26 @@
               "removed": false
             },
             {
+              "id": "description",
+              "displayName": "description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "hashtags",
+              "displayName": "hashtags",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
               "id": "is-created",
               "displayName": "is-created",
               "required": false,
@@ -1041,15 +1085,15 @@
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.7,
       "position": [
-        -912,
-        80
+        2096,
+        176
       ],
-      "id": "3332b7e4-eaf8-49a5-9009-7c7a1ffe2ad6",
+      "id": "6642f1c2-14c6-487a-824e-25e079b32795",
       "name": "Append or update row in sheet2",
       "credentials": {
         "googleSheetsOAuth2Api": {
-          "id": "gZaoLxt4XGhKKtsb",
-          "name": "Google Sheets account 2"
+          "id": "QhLEoNxrbLPUasdS",
+          "name": "Google Sheets account"
         }
       }
     },
@@ -1195,15 +1239,15 @@
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.7,
       "position": [
-        16,
-        816
+        3024,
+        912
       ],
-      "id": "5d21694b-accc-4ec5-b8f7-a1a9efa8d6e4",
+      "id": "8d15ae09-a9dd-4f7c-8b17-e250b408e0e5",
       "name": "Append or update row in sheet3",
       "credentials": {
         "googleSheetsOAuth2Api": {
-          "id": "gZaoLxt4XGhKKtsb",
-          "name": "Google Sheets account 2"
+          "id": "QhLEoNxrbLPUasdS",
+          "name": "Google Sheets account"
         }
       }
     },
@@ -1329,15 +1373,15 @@
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.7,
       "position": [
-        656,
-        80
+        3664,
+        176
       ],
-      "id": "875ab7dd-5deb-4b1a-9998-b12a934a88a6",
+      "id": "69b48f58-616a-4191-b7d6-699e4a86ef6b",
       "name": "Append or update row in sheet4",
       "credentials": {
         "googleSheetsOAuth2Api": {
-          "id": "gZaoLxt4XGhKKtsb",
-          "name": "Google Sheets account 2"
+          "id": "QhLEoNxrbLPUasdS",
+          "name": "Google Sheets account"
         }
       }
     }
@@ -1761,19 +1805,20 @@
   },
   "active": false,
   "settings": {
-    "executionOrder": "v1"
+    "executionOrder": "v1",
+    "availableInMCP": false
   },
-  "versionId": "48c8d145-4c51-4a59-a411-4b1f7f6047a6",
+  "versionId": "09a586b7-068f-4b37-a728-a8dda2110417",
   "meta": {
     "templateCredsSetupCompleted": true,
-    "instanceId": "9c6bcd60ca9bde2416ba709cf63e8cb22eab52dd5eb1fc1077b71083ed87571d"
+    "instanceId": "f7a1b8a05952cd3efe80f40887a424d7cb484d1d251923b3e5919cd5a136be89"
   },
-  "id": "4O0UNRQfYaWYJgeC",
+  "id": "w81fcQjWEnEIFeGjy68cj",
   "tags": [
     {
-      "updatedAt": "2026-01-06T21:12:08.748Z",
-      "createdAt": "2026-01-06T21:12:08.748Z",
-      "id": "WN7ANT3zKt3erNP1",
+      "updatedAt": "2026-01-14T21:04:10.769Z",
+      "createdAt": "2026-01-14T21:04:10.769Z",
+      "id": "jGdm7XRhuR5qC1Rh",
       "name": "youtube"
     }
   ]
