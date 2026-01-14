@@ -1,0 +1,1780 @@
+{
+  "name": "PslyoMind channel on youtube copy",
+  "nodes": [
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a19f9caa-f1aa-4ff0-a270-59248eeb27dd",
+              "name": "SERVER_URL",
+              "value": "http://host.docker.internal:3123",
+              "type": "string"
+            },
+            {
+              "id": "85f6a401-7a8f-4002-900d-8320cee8f553",
+              "name": "",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2720,
+        848
+      ],
+      "id": "bae00c4d-e7ea-4bbb-9eff-ff3b3b4fd3b3",
+      "name": "Configure1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Configure1').item.json.SERVER_URL }}/api/short-video",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"scenes\": {{ JSON.stringify($('Generate content1').item.json.output.scenes, null, 2) }},\n  \"config\": {\n    \"paddingBack\": 1500,\n    \"music\": \"{{ $json.output.musicTag }}\",\n    \"voice\":\"am_adam\"\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1152,
+        848
+      ],
+      "id": "c8391771-e746-4c17-a0e6-3d4f213c8495",
+      "name": "Start generating the video1"
+    },
+    {
+      "parameters": {
+        "amount": 25
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -704,
+        832
+      ],
+      "id": "c8434a4a-caf9-4ead-85f3-1e16bdaaf57e",
+      "name": "Wait1",
+      "webhookId": "873acdce-b922-4ce7-b28e-9161d4db4156"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Configure1').item.json.SERVER_URL }}/api/short-video/{{ $('Start generating the video1').item.json.videoId }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        320,
+        768
+      ],
+      "id": "5f8e7872-a3fc-458b-a792-f8cad7bb091f",
+      "name": "Download the video1",
+      "alwaysOutputData": true,
+      "retryOnFail": false
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Configure1').item.json.SERVER_URL }}/api/short-video/{{ $('Start generating the video1').item.json.videoId }}/status",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -432,
+        832
+      ],
+      "id": "2896c0a1-5e75-421f-95c8-392c3d307c79",
+      "name": "Check video status1",
+      "alwaysOutputData": false,
+      "retryOnFail": false
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "6cc1bd80-2bb7-47b6-950e-be3d6a36a965",
+              "leftValue": "={{ $json.status }}",
+              "rightValue": "ready",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -208,
+        832
+      ],
+      "id": "9df67714-c512-4b7b-bda3-90bdfeec93b2",
+      "name": "Ready?1"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.SERVER_URL }}/api/music-tags",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -2528,
+        848
+      ],
+      "id": "e491fbf2-0f9c-4777-829a-276809e0a365",
+      "name": "Get music tags1"
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n    \"type\": \"object\",\n    \"properties\": {\n        \"musicTag\": {\n            \"type\": \"string\",\n            \"description\": \"the selected music tag that goes well with the video\"\n        }\n    },\n    \"required\": [\n        \"musicTag\"\n    ]\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        -1344,
+        1072
+      ],
+      "id": "d4582e83-ed6d-4971-bd68-273819da7b3d",
+      "name": "Structured Output Parser3"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=I'm generating a video programmatically using an API. I've already generated the scenes, and your task is to find the right music tag for he video.\n\n<VideoScenes>\n{{ $json.output.scenes.map(item => item.text).map(item => `<VideoScene>${item}</VideoScene>`).join('\\n') }}\n</VideoScenes>\n\n<MusicTags>\n{{ $('Group the music tags1').item.json.data.map(item => `<MusicTag>${item}</MusicTag>`).join('\\n') }}\n</MusicTags>",
+        "hasOutputParser": true
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.6,
+      "position": [
+        -1488,
+        848
+      ],
+      "id": "a972121a-415b-41f8-81b4-15298cc70ae6",
+      "name": "Pick the right music1",
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        -2240,
+        848
+      ],
+      "id": "addb688d-1db7-459d-8d41-8ff515bab19e",
+      "name": "Group the music tags1"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -2960,
+        848
+      ],
+      "id": "f4c3b089-03fb-44f5-a07c-05847deab315",
+      "name": "Schedule Trigger1"
+    },
+    {
+      "parameters": {
+        "resource": "video",
+        "operation": "upload",
+        "title": "={{ $('Generate content1').item.json.output.video_title }}",
+        "regionCode": "YE",
+        "categoryId": "22",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.youTube",
+      "typeVersion": 1,
+      "position": [
+        688,
+        768
+      ],
+      "id": "4f3dc46d-bb85-44c0-97fc-27ccccde6325",
+      "name": "YouTube Video",
+      "retryOnFail": true,
+      "maxTries": 5,
+      "credentials": {
+        "youTubeOAuth2Api": {
+          "id": "ow2hxK9eqrCRWaFb",
+          "name": "YouTube account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## YouTube Short Video Node"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -2992,
+        624
+      ],
+      "id": "cf4fdbf7-1422-47e7-b4fa-2bddcffe6c4b",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## YouTube Long Video Node"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -3008,
+        -96
+      ],
+      "id": "4075f640-9bad-4fd3-aa65-4db2c2634ebe",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "0",
+        "contextWindowLength": 10000
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -1856,
+        1168
+      ],
+      "id": "13488a91-ddae-42fc-8fd7-766af186dbe5",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n    \"type\": \"object\",\n    \"properties\": {\n        \"video_title\": {\n          \"type\": \"string\",\n          \"description\": \"the title of the video we use on YouTube\"\n        },\n        \"scenes\": {\n            \"type\": \"array\",\n            \"description\": \"the scenes of the video\",\n            \"items\": {\n                \"type\": \"object\",\n                \"properties\": {\n                    \"text\": {\n                        \"type\": \"string\",\n                        \"description\": \"the main content; this will be used to generate speech from\"\n                    },\n                    \"searchTerms\": {\n                        \"type\": \"array\",\n                        \"description\": \"the search terms to use to find background videos on pexels\",\n                        \"items\": {\n                            \"type\": \"string\"\n                        }\n                    }\n                },\n                \"required\": [\n                    \"text\",\n                    \"searchTerms\"\n                ]\n            }\n        }\n    },\n    \"required\": [\n        \"scenes\",\n        \"video_title\"\n    ]\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        -1696,
+        1152
+      ],
+      "id": "8096c6c1-cc41-4949-b415-1d37cba131b6",
+      "name": "Structured Output Parser4"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -1984,
+        1152
+      ],
+      "id": "111291c6-557c-4763-85ec-0a9a068df74d",
+      "name": "Google Gemini Chat Model2",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "uZNIeRLPuGdyNfYf",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "I am creating a video programmatically using an API.\nThe API requires scenes to work with.\nEach scene requires the following:\nText that will be converted into audio using AI technology.\nTwo to three keywords to search for background videos from Pexels.\nYour Task:\nCreate a short video of 6-scenes about any psychological, mental, manipulation, Self-Discovery, Dark Psychology, Root Cause, Social Intelligence, or other popular psychology-related topics.\nThese videos are for YouTube Shorts, so they should be fast-paced, engaging, and suspenseful.\n\nThe channel name is \"PsyloMind\" and the link https://www.youtube.com/@PsyloMind\n\nEach scene should be unique, unusual, or shocking, and not repetitive in the channel, to keep viewers watching and not skipping.\nThe topic must be new and not already created or covered before.\nStyle Guidelines:\n\nThe video should begin with one of the following hooks:\nProtection Hook, Visual Hook, Paradox Hook, Interactive Hook, Actionable Hook, Self-Discovery Hook, Dark Psychology Hook, Challenge Hook, Root Cause Hook, Social Intelligence Hook.\n\nTopic: Psychology, human behavior, social psychology, the intricacies of the human psyche, human nature, human personalities, human behavior patterns, types of mindsets, , Self-Discovery, Dark Psychology, Root Cause, Social Intelligence and other topics related to the channel's content and target audience.\n\nPace: The video should keep viewers engaged and prevent them from skipping to the end.\n\nNo Repetition: Choose a new, trending topic for each video.\nStructure/Scenes:\nScene 1: A strong opening to grab attention immediately with a catchy hook.\nScenes 2-5:depending on the topic. Focus on providing valuable information that keeps the viewer engaged and prevents boredom.Keep the sentences punchy and avoid \"filler\" words.\nScene 6: A final thought-provoking statement that leaves the viewer thinking. Followed by a clear invitation: \"Subscribe to PsyloMind to unlock the secrets of your mind. Like, comment your thoughts, and visit the channel for more deep dives.\"\n\nInstructions:\n\"Now, keeping in mind that he will be using Adam's voice for the voiceover, create a complete script for a short video with 6 scenes using this format, optimized for  Psychology, human behavior, social psychology, the intricacies of the human psyche, human nature, human personalities, human behavior patterns, types of mindsets, , Self-Discovery, Dark Psychology, Root Cause, Social Intelligence and other topics related to the channel's content and target audience, ready for YouTube Shorts. Make it highly engaging, shareable, and intriguing.\"",
+        "hasOutputParser": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        -1936,
+        848
+      ],
+      "id": "e16756da-b2ed-432f-bef8-cd29d34e4304",
+      "name": "Generate content1",
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "resource": "video",
+        "operation": "upload",
+        "title": "={{ $('Generate content').item.json.output.video_title }}",
+        "regionCode": "YE",
+        "categoryId": "22",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.youTube",
+      "typeVersion": 1,
+      "position": [
+        352,
+        0
+      ],
+      "id": "6806f583-2d68-4827-b970-b9de7b0bf241",
+      "name": "YouTube Short",
+      "credentials": {
+        "youTubeOAuth2Api": {
+          "id": "ow2hxK9eqrCRWaFb",
+          "name": "YouTube account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "6cc1bd80-2bb7-47b6-950e-be3d6a36a965",
+              "leftValue": "={{ $json.status }}",
+              "rightValue": "ready",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -224,
+        64
+      ],
+      "id": "99e987c1-0b3c-4baa-a75c-ba47411375c4",
+      "name": "Ready?"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Configure').item.json.SERVER_URL }}/api/short-video/{{ $('Start generating the video').item.json.videoId }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "296f2e93-5927-4c59-bd41-779565819c95",
+      "name": "Download the video",
+      "alwaysOutputData": true,
+      "retryOnFail": false
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -2976,
+        80
+      ],
+      "id": "92ee9854-c243-4b39-ae5a-82d697ae61f3",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        -2256,
+        80
+      ],
+      "id": "8bd7a368-2960-4b0c-a3b8-8159966104f5",
+      "name": "Group the music tags"
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n    \"type\": \"object\",\n    \"properties\": {\n        \"musicTag\": {\n            \"type\": \"string\",\n            \"description\": \"the selected music tag that goes well with the video\"\n        }\n    },\n    \"required\": [\n        \"musicTag\"\n    ]\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        -1360,
+        304
+      ],
+      "id": "67b010f6-ab09-4f7b-a085-610790f36fa5",
+      "name": "Structured Output Parser1"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.SERVER_URL }}/api/music-tags",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -2544,
+        80
+      ],
+      "id": "1109a666-f200-4386-aaa7-c02622f87359",
+      "name": "Get music tags"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Configure').item.json.SERVER_URL }}/api/short-video/{{ $('Start generating the video').item.json.videoId }}/status",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -448,
+        64
+      ],
+      "id": "dd943668-6661-48ed-b400-c2af3d55f0d0",
+      "name": "Check video status",
+      "alwaysOutputData": false,
+      "retryOnFail": false
+    },
+    {
+      "parameters": {
+        "amount": 25
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -720,
+        64
+      ],
+      "id": "9ea88d68-83e6-45ea-81b8-3a727999c700",
+      "name": "Wait",
+      "webhookId": "f96b7ef5-7f33-4739-b2f6-9b87f7d076be"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Configure').item.json.SERVER_URL }}/api/short-video",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"scenes\": {{ JSON.stringify($('Generate content').item.json.output.scenes, null, 2) }},\n  \"config\": {\n    \"paddingBack\": 1500,\n    \"music\": \"{{ $json.output.musicTag }}\",\n    \"voice\":\"am_liam\",\n    \"orientation\":\"landscape\"\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1152,
+        80
+      ],
+      "id": "78c1a397-ebf4-41ba-a67d-fde5cba153d1",
+      "name": "Start generating the video"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a19f9caa-f1aa-4ff0-a270-59248eeb27dd",
+              "name": "SERVER_URL",
+              "value": "http://host.docker.internal:3123",
+              "type": "string"
+            },
+            {
+              "id": "85f6a401-7a8f-4002-900d-8320cee8f553",
+              "name": "",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2736,
+        80
+      ],
+      "id": "6984f571-4730-490f-916b-91e76fb08ca4",
+      "name": "Configure"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=I am creating a video programmatically using an API.\nThe API requires scenes to work with.\n\nEach scene requires the following:\n\nText that will be converted into audio using AI technology.\n\nTwo to three keywords to search for background videos from Pexels.\n\nYour Task\n\nCreate a short video of 6-scenes about any psychological, mental, or manipulation topic, or other popular psychology-related topics.\nThese videos are for YouTube Shorts, so they should be fast-paced, engaging, and suspenseful.\n\nThe channel name is \"PsyloMind\".\nEach scene should be unique, unusual, or shocking, and not repetitive, to make viewers say:\n\"Unbelievable... I want to know more!\"\n\nThe topic must be new and not already created or covered before.\n\nStyle Guidelines\n\nMany videos should start with catchy, psychologically intriguing phrases.\n\nTone: Curious, unusual, mysterious, psychological, mind-bending.\n\nTopic: Psychology, human behavior, social psychology, the intricacies of the human psyche, human nature, human personalities, human behavior patterns, types of mindsets, and other topics related to the channel's content and target audience.\n\nPacing: Each scene should feel like a \"mini-discovery\" that builds suspense.\n\nNo Repetition: Choose a new, trending topic for each video.\n\nStructure/Scenes\n\nScene 1: A strong opening to immediately grab attention.\n\nScenes 2-5: Short, shocking, or intriguing facts, psychological insights, or unusual mental phenomena. Scene 6: Conclude with a surprise or a thought-provoking statement, and a clear call to action to subscribe to the channel to encourage viewers to subscribe, comment, like the video, and visit the channel.\n\n\"Which fact surprised you the most?\"\n\n\"Has this ever happened to you?\"\n\n\"Your mind might be hiding this... look closely.\"\n\nInstructions:\n\"Now, create a complete script for a short video with 6 scenes using this format, optimized for psychology/human behavior/mind-bending content, ready for YouTube Shorts. Make it highly engaging, shareable, and intriguing.\"",
+        "hasOutputParser": true
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.6,
+      "position": [
+        -3008,
+        352
+      ],
+      "id": "794bcaa5-ac13-4ed4-9f30-0ca9b32991b9",
+      "name": "Generate content - backup",
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -1984,
+        432
+      ],
+      "id": "0bb6fd31-4a49-42b7-8fda-d64984050604",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "WRQdLoO2VApZK7LV",
+          "name": "Google Gemini(PaLM) Api account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n    \"type\": \"object\",\n    \"properties\": {\n        \"video_title\": {\n          \"type\": \"string\",\n          \"description\": \"the title of the video we use on YouTube\"\n        },\n        \"scenes\": {\n            \"type\": \"array\",\n            \"description\": \"the scenes of the video\",\n            \"items\": {\n                \"type\": \"object\",\n                \"properties\": {\n                    \"text\": {\n                        \"type\": \"string\",\n                        \"description\": \"the main content; this will be used to generate speech from\"\n                    },\n                    \"searchTerms\": {\n                        \"type\": \"array\",\n                        \"description\": \"the search terms to use to find background videos on pexels\",\n                        \"items\": {\n                            \"type\": \"string\"\n                        }\n                    }\n                },\n                \"required\": [\n                    \"text\",\n                    \"searchTerms\"\n                ]\n            }\n        }\n    },\n    \"required\": [\n        \"scenes\",\n        \"video_title\"\n    ]\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        -1744,
+        432
+      ],
+      "id": "9652b756-1787-4cfe-ab27-2d74f132465d",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "I am creating a video programmatically using an API.\nThe API requires scenes to work with.\n\nEach scene requires the following:\nText that will be converted into audio using AI technology.\nTwo to three keywords to search for background videos from Pexels.\n\nYour Task: Create a long video consisting of several scenes on any topic related to psychology, mental health, manipulation, self-discovery, dark psychology, root causes, social intelligence, or other popular psychology topics.\n\nThe channel name is \"PsyloMind\" and the link https://www.youtube.com/@PsyloMind\n\nEach scene must be unique, engaging, intriguing, and not repeated on the channel to attract viewers and entice them to click and watch the video.\n\nThe video should begin with one of the following hooks:\nProtection Hook, Visual Hook, Paradox Hook, Interactive Hook, Actionable Hook, Self-Discovery Hook, Dark Psychology Hook, Challenge Hook, Root Cause Hook, Social Intelligence Hook.\n\nTopics: Psychology, human behavior, social psychology, the intricacies of the human psyche, human nature, human personalities, human behavior patterns, types of mindsets, , Self-Discovery, Dark Psychology, Root Cause, Social Intelligence and other topics related to the channel's content and target audience.\n\nPace: The video should keep viewers engaged and prevent them from skipping to the end of the viedo.\n\nNo Repetition: Choose a new, trending topic for each video.\n\nStructure/Scenes:\n- The video must be at least four minutes long.\n\n- First Scene: A strong opening to grab attention immediately with a catchy hook in Protection Hook, Visual Hook, Paradox Hook, Interactive Hook, Actionable Hook, Self-Discovery Hook, Dark Psychology Hook, Challenge Hook, Root Cause Hook, Social Intelligence Hook.\n\n- The scenes should be sequentially presented in an engaging style that compels the viewer to continue watching. They should be informative, concise, and provide high-quality content that satisfies the viewer and answers all their questions, keep the sentences punchy and avoid \"filler\" words.\n\n- There should be a 3-5 second gap between each scene.\n\n- The script should be written keeping in mind that Liam's voice will be used for the voiceover, so you should capitalize on the strengths of his voice and avoid its weaknesses.\n\n- Final Scene: A final thought-provoking statement that leaves the viewer thinking. Followed by a clear invitation: \"Subscribe to PsyloMind to unlock the secrets of your mind. Like, comment your thoughts, and visit the channel for more deep dives.\"\n\n\nInstructions:\n\"Now, keeping in mind that he will be using Liam's voice for the voiceover, create a complete script for a Create a long video consisting of several scenes using this format, optimized for  Psychology, human behavior, social psychology, the intricacies of the human psyche, human nature, human personalities, human behavior patterns, types of mindsets, , Self-Discovery, Dark Psychology, Root Cause, Social Intelligence and other topics related to the channel's content and target audience, ready for YouTube Shorts. Make it highly engaging, shareable, and intriguing.\"",
+        "hasOutputParser": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        -1888,
+        96
+      ],
+      "id": "76dab72b-d867-4632-bece-08abdef2ee06",
+      "name": "Generate content",
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "1",
+        "contextWindowLength": 100000
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -1856,
+        432
+      ],
+      "id": "30078de9-64bd-496b-abea-d7456ac2acfb",
+      "name": "Simple Memory1"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=I'm generating a video programmatically using an API. I've already generated the scenes, and your task is to find the right music tag for he video.\n\n<VideoScenes>\n{{ $json.output.scenes.map(item => item.text).map(item => `<VideoScene>${item}</VideoScene>`).join('\\n') }}\n</VideoScenes>\n\n<MusicTags>\n{{ $('Group the music tags').item.json.data.map(item => `<MusicTag>${item}</MusicTag>`).join('\\n') }}\n</MusicTags>",
+        "hasOutputParser": true
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.6,
+      "position": [
+        -1504,
+        80
+      ],
+      "id": "b971bea6-82e9-430b-a914-64a7a51b04b1",
+      "name": "Pick the right music",
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1eTWY45XDtALueJY2vnOdYrooUaVLJfy-IkKAv7hwjmU",
+          "mode": "list",
+          "cachedResultName": "videos_docs.csv",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1eTWY45XDtALueJY2vnOdYrooUaVLJfy-IkKAv7hwjmU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "الورقة1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1eTWY45XDtALueJY2vnOdYrooUaVLJfy-IkKAv7hwjmU/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Video-Title": "={{ $('Generate content').item.json.output.video_title }}",
+            "Video-Text": "={{ $('Generate content').item.json.output.scenes.map(item => item.text).join('\\n') }}",
+            "Video-url": "={{ $json.videoId }}",
+            "Date": "={{ $now.format('yyyy-MM-dd HH:mm:ss') }}",
+            "Scenes": "={{ $('Generate content').item.json.output.scenes.length }}",
+            "video-type": "Youtube-Long",
+            "is-created": "TRUE",
+            "is-publish": "FALSE"
+          },
+          "matchingColumns": [
+            "Video-Text"
+          ],
+          "schema": [
+            {
+              "id": "Video-Title",
+              "displayName": "Video-Title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Video-Text",
+              "displayName": "Video-Text",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Video-url",
+              "displayName": "Video-url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Scenes",
+              "displayName": "Scenes",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "video-type",
+              "displayName": "video-type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "is-created",
+              "displayName": "is-created",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "is-publish",
+              "displayName": "is-publish",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        0,
+        240
+      ],
+      "id": "e5e13a5b-b38d-4125-8b49-1686a63c7726",
+      "name": "Append or update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gZaoLxt4XGhKKtsb",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1eTWY45XDtALueJY2vnOdYrooUaVLJfy-IkKAv7hwjmU",
+          "mode": "list",
+          "cachedResultName": "videos_docs.csv",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1eTWY45XDtALueJY2vnOdYrooUaVLJfy-IkKAv7hwjmU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "الورقة1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1eTWY45XDtALueJY2vnOdYrooUaVLJfy-IkKAv7hwjmU/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Video-Title": "={{ $('Generate content1').item.json.output.video_title }}",
+            "Video-Text": "={{ $('Generate content1').item.json.output.scenes.map(item => item.text).join('\\n') }}",
+            "Video-url": "={{ $json.videoId }}",
+            "Date": "={{ $now.format('yyyy-MM-dd HH:mm:ss') }}",
+            "Scenes": "={{ $('Generate content1').item.json.output.scenes.length }}",
+            "video-type": "Youtube-Short",
+            "is-created": "FALSE",
+            "is-publish": "FALSE"
+          },
+          "matchingColumns": [
+            "Video-Text"
+          ],
+          "schema": [
+            {
+              "id": "Video-Title",
+              "displayName": "Video-Title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Video-Text",
+              "displayName": "Video-Text",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Video-url",
+              "displayName": "Video-url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Scenes",
+              "displayName": "Scenes",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "video-type",
+              "displayName": "video-type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "description",
+              "displayName": "description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "hashtags",
+              "displayName": "hashtags",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "is-created",
+              "displayName": "is-created",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "is-publish",
+              "displayName": "is-publish",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -912,
+        848
+      ],
+      "id": "2f9fe8d0-8937-4920-b342-fa46a1da7358",
+      "name": "Append or update row in sheet1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gZaoLxt4XGhKKtsb",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1eTWY45XDtALueJY2vnOdYrooUaVLJfy-IkKAv7hwjmU",
+          "mode": "list",
+          "cachedResultName": "videos_docs.csv",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1eTWY45XDtALueJY2vnOdYrooUaVLJfy-IkKAv7hwjmU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "الورقة1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1eTWY45XDtALueJY2vnOdYrooUaVLJfy-IkKAv7hwjmU/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Video-Title": "={{ $('Generate content').item.json.output.video_title }}",
+            "Video-Text": "={{ $('Generate content').item.json.output.scenes.map(item => item.text).join('\\n') }}",
+            "Video-url": "={{ $json.videoId }}",
+            "Date": "={{ $now.format('yyyy-MM-dd HH:mm:ss') }}",
+            "Scenes": "={{ $('Generate content').item.json.output.scenes.length }}",
+            "video-type": "Youtube-Long",
+            "is-created": "TRUE",
+            "is-publish": "FALSE"
+          },
+          "matchingColumns": [
+            "Video-Text"
+          ],
+          "schema": [
+            {
+              "id": "Video-Title",
+              "displayName": "Video-Title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Video-Text",
+              "displayName": "Video-Text",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Video-url",
+              "displayName": "Video-url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Scenes",
+              "displayName": "Scenes",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "video-type",
+              "displayName": "video-type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "is-created",
+              "displayName": "is-created",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "is-publish",
+              "displayName": "is-publish",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -912,
+        80
+      ],
+      "id": "3332b7e4-eaf8-49a5-9009-7c7a1ffe2ad6",
+      "name": "Append or update row in sheet2",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gZaoLxt4XGhKKtsb",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1eTWY45XDtALueJY2vnOdYrooUaVLJfy-IkKAv7hwjmU",
+          "mode": "list",
+          "cachedResultName": "videos_docs.csv",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1eTWY45XDtALueJY2vnOdYrooUaVLJfy-IkKAv7hwjmU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "الورقة1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1eTWY45XDtALueJY2vnOdYrooUaVLJfy-IkKAv7hwjmU/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Video-Title": "={{ $('Generate content1').item.json.output.video_title }}",
+            "Video-Text": "={{ $('Generate content1').item.json.output.scenes.map(item => item.text).join('\\n') }}",
+            "Video-url": "={{ $json.videoId }}",
+            "Date": "={{ $now.format('yyyy-MM-dd HH:mm:ss') }}",
+            "Scenes": "={{ $('Generate content1').item.json.output.scenes.length }}",
+            "video-type": "Youtube-Short",
+            "is-created": "TRUE",
+            "is-publish": "FALSE"
+          },
+          "matchingColumns": [
+            "Video-Text"
+          ],
+          "schema": [
+            {
+              "id": "Video-Title",
+              "displayName": "Video-Title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Video-Text",
+              "displayName": "Video-Text",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Video-url",
+              "displayName": "Video-url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Scenes",
+              "displayName": "Scenes",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "video-type",
+              "displayName": "video-type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "description",
+              "displayName": "description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "hashtags",
+              "displayName": "hashtags",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "is-created",
+              "displayName": "is-created",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "is-publish",
+              "displayName": "is-publish",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        16,
+        816
+      ],
+      "id": "5d21694b-accc-4ec5-b8f7-a1a9efa8d6e4",
+      "name": "Append or update row in sheet3",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gZaoLxt4XGhKKtsb",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1eTWY45XDtALueJY2vnOdYrooUaVLJfy-IkKAv7hwjmU",
+          "mode": "list",
+          "cachedResultName": "videos_docs.csv",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1eTWY45XDtALueJY2vnOdYrooUaVLJfy-IkKAv7hwjmU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "الورقة1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1eTWY45XDtALueJY2vnOdYrooUaVLJfy-IkKAv7hwjmU/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Video-Title": "={{ $('Generate content').item.json.output.video_title }}",
+            "Video-Text": "={{ $('Generate content').item.json.output.scenes.map(item => item.text).join('\\n') }}",
+            "Video-url": "={{ $json.videoId }}",
+            "Date": "={{ $now.format('yyyy-MM-dd HH:mm:ss') }}",
+            "Scenes": "={{ $('Generate content').item.json.output.scenes.length }}",
+            "video-type": "Youtube-Long",
+            "is-created": "TRUE",
+            "is-publish": "TRUE"
+          },
+          "matchingColumns": [
+            "Video-Text"
+          ],
+          "schema": [
+            {
+              "id": "Video-Title",
+              "displayName": "Video-Title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Video-Text",
+              "displayName": "Video-Text",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Video-url",
+              "displayName": "Video-url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Scenes",
+              "displayName": "Scenes",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "video-type",
+              "displayName": "video-type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "is-created",
+              "displayName": "is-created",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "is-publish",
+              "displayName": "is-publish",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        656,
+        80
+      ],
+      "id": "875ab7dd-5deb-4b1a-9998-b12a934a88a6",
+      "name": "Append or update row in sheet4",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "gZaoLxt4XGhKKtsb",
+          "name": "Google Sheets account 2"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Configure1": {
+      "main": [
+        [
+          {
+            "node": "Get music tags1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start generating the video1": {
+      "main": [
+        [
+          {
+            "node": "Append or update row in sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait1": {
+      "main": [
+        [
+          {
+            "node": "Check video status1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download the video1": {
+      "main": [
+        [
+          {
+            "node": "YouTube Video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check video status1": {
+      "main": [
+        [
+          {
+            "node": "Ready?1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ready?1": {
+      "main": [
+        [
+          {
+            "node": "Append or update row in sheet3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get music tags1": {
+      "main": [
+        [
+          {
+            "node": "Group the music tags1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser3": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Pick the right music1",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pick the right music1": {
+      "main": [
+        [
+          {
+            "node": "Start generating the video1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Group the music tags1": {
+      "main": [
+        [
+          {
+            "node": "Generate content1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger1": {
+      "main": [
+        [
+          {
+            "node": "Configure1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "Generate content1",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser4": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Generate content1",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Generate content1",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Pick the right music1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate content1": {
+      "main": [
+        [
+          {
+            "node": "Pick the right music1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ready?": {
+      "main": [
+        [
+          {
+            "node": "Download the video",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Append or update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download the video": {
+      "main": [
+        [
+          {
+            "node": "YouTube Short",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Configure",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Group the music tags": {
+      "main": [
+        [
+          {
+            "node": "Generate content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser1": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Pick the right music",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get music tags": {
+      "main": [
+        [
+          {
+            "node": "Group the music tags",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check video status": {
+      "main": [
+        [
+          {
+            "node": "Ready?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Check video status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start generating the video": {
+      "main": [
+        [
+          {
+            "node": "Append or update row in sheet2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Configure": {
+      "main": [
+        [
+          {
+            "node": "Get music tags",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Generate content",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Pick the right music",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Generate content",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory1": {
+      "ai_memory": [
+        [
+          {
+            "node": "Generate content",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate content": {
+      "main": [
+        [
+          {
+            "node": "Pick the right music",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pick the right music": {
+      "main": [
+        [
+          {
+            "node": "Start generating the video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append or update row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Download the video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append or update row in sheet1": {
+      "main": [
+        [
+          {
+            "node": "Wait1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append or update row in sheet2": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append or update row in sheet3": {
+      "main": [
+        [
+          {
+            "node": "Download the video1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "YouTube Short": {
+      "main": [
+        [
+          {
+            "node": "Append or update row in sheet4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "48c8d145-4c51-4a59-a411-4b1f7f6047a6",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "9c6bcd60ca9bde2416ba709cf63e8cb22eab52dd5eb1fc1077b71083ed87571d"
+  },
+  "id": "4O0UNRQfYaWYJgeC",
+  "tags": [
+    {
+      "updatedAt": "2026-01-06T21:12:08.748Z",
+      "createdAt": "2026-01-06T21:12:08.748Z",
+      "id": "WN7ANT3zKt3erNP1",
+      "name": "youtube"
+    }
+  ]
+}
